@@ -1,9 +1,10 @@
 /**
- * Created by khamar on 3/2/2018.
+ * Created by khamar on 23/3/2018.
  */
 
 package com.example.root.bluetooth;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.UUID;
@@ -52,7 +54,7 @@ public class SecondActivity extends Activity{
 
     Button btrain, bwork;
     TextView tvalue, wvalue;
-    EditText message,inputText;
+    EditText message;
     Handler h;
     public boolean start = false;
 
@@ -76,11 +78,17 @@ public class SecondActivity extends Activity{
     private static String address = "98:D3:34:90:B8:02";
     File train, work;
     FileWriter mFileWriter;
+
     String dir = "data";
     String myData = "";
     String mes = null;
     int check = 0;
-
+    String[] workstring=null,trainstring=null;
+    String rawtrain,trainstringspace,gestureName;
+    int[] workint = new int[3];
+    int[] trainint = new int[]{0,0,0};
+    int startindex,endindex,flag=0;
+    int i;
 
 
     //Memeber Fields
@@ -98,6 +106,7 @@ public class SecondActivity extends Activity{
     public String deviceName = null;
 
     /** Called when the activity is first created. */
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,7 +118,7 @@ public class SecondActivity extends Activity{
         tvalue.setText("");
         wvalue.setText("");
 
-        inputText = (EditText) findViewById(R.id.myInputText);
+
 
         train = new File(getExternalFilesDir(dir), "train.txt");
         work = new File(getExternalFilesDir(dir), "work.txt");
@@ -134,6 +143,7 @@ public class SecondActivity extends Activity{
                         //byte[] readBuf = (byte[]) msg.obj;
                         //String strIncom = new String(readBuf, 0, msg.arg1);					// create string from bytes array
                         String recv = (String) msg.obj;
+
 
                     if(start)
                     {
@@ -279,39 +289,144 @@ public class SecondActivity extends Activity{
                     check = 0;
                     Log.d("Debug: ", "stopped receiving\n");
                     try {
-                        mFileWriter.append(sbprint.toString() + "\n");
+                        PrintWriter writer = new PrintWriter(work);
+
+                        writer.flush();
+                        writer.close();
+                        mFileWriter.write(sbprint.toString() + "\n");
                         mFileWriter.close();
+                        //split sbprint across space into integer array of 3
+                        //open train.txt for reading
+                        //for line 1 to n
+                        //remove text and store it in gesture name
+                        //remove till hyphen and store it in string1
+                        //split string1 across space into another integer array of 3
+                        // check with arr1 and arr2
+                        //if equals print text break
+                        //else repeat loop
+
+                        tvalue.setText(sbprint);
 
 
 
-                        //read from work.txt file
-                        FileInputStream fis = new FileInputStream(work);
+                        workstring = sbprint.split(" ");
+
+
+                        for(i=0;i<3;i++) {
+                            try {
+                                workint[i] = Integer.parseInt(workstring[i]);
+                            } catch (NumberFormatException nfe) {
+                                //tv.setText("Could not parse " + nfe);
+                            }
+                        }
+
+                        tvalue.setText("parsed");
+
+
+
+                        FileInputStream fis = new FileInputStream(train);
                         DataInputStream in = new DataInputStream(fis);
                         BufferedReader br =
                                 new BufferedReader(new InputStreamReader(in));
-                        String strLine;
-                        myData="";
-                        while ((strLine = br.readLine()) != "-") {
-                            myData = myData + strLine;
+
+                        String strLine = br.readLine();;
+
+
+
+//                        for(i=0;i<10;i++) {
+                        while(strLine != null) {
+                            flag=0;
+                            int length = 0;
+                            rawtrain = "";
+
+                            rawtrain = rawtrain + strLine;
+                            length = rawtrain.length();
+                            strLine = br.readLine();
+
+                            tvalue.setText(rawtrain);
+
+                            startindex = 0;
+                            endindex = rawtrain.indexOf("-", startindex);
+
+                            gestureName = rawtrain.substring(startindex, endindex);
+
+                            tvalue.setText(gestureName);
+
+                            startindex = endindex;
+                            endindex = length;
+
+                            tvalue.setText("" + endindex);
+                            trainstringspace = rawtrain.substring(startindex + 2, endindex);
+
+                            tvalue.setText(trainstringspace);
+
+
+                            trainstring = trainstringspace.split(" ");
+
+                            for (i = 0; i < 3; i++) {
+                                try {
+                                    trainint[i] = Integer.parseInt(trainstring[i]);
+                                } catch (NumberFormatException nfe) {
+                                    //tv.setText("Could not parse " + nfe);
+                                }
+                            }
+
+                            tvalue.setText("before compare");
+
+                            if ((workint[0] >= 0 && trainint[0] >= 0) || (workint[0] < 0 && trainint[0] < 0)) {
+                                for (i = 1; i < 3; i++) {
+                                    if (workint[i] >= trainint[i] - 3 && workint[i] <= trainint[i] + 3) {
+                                        flag++;
+                                    }
+                                }
+                            }
+
+
+                            tvalue.setText("after");
+                            tvalue.setText("" + flag);
+                            tvalue.setText("" + workint[0] + " " + trainint[0] + " " + workint[1] + " " + trainint[1] + workint[2] + " " + trainint[2]);
+
+                            if (flag == 2) {
+                                tvalue.setText(gestureName);
+                                break;
+                            }
+
+
+                        }
+                        if(flag<2) {
+                            tvalue.setText("No gesture matched");
                         }
 
-                        in.close();
 
 
 
 
 
 
-                    }
+
+                       in.close();
 
 
 
 
-                    catch (IOException e){
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    }catch (IOException e){
                         e.printStackTrace();
                     }
                     sb1.delete(0, sb1.length());
-                    inputText.setText(myData);
+                    //inputText.setText(myData);
                 }
                 return true;
             }
