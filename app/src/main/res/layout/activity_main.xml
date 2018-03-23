@@ -1,58 +1,36 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+    >
+<TextView android:id="@+id/title_paired_devices"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceLarge"
+    android:text="Select btSerial device from paired devices:"
+    android:visibility="gone"
+    android:background="#666"
+    android:textColor="#fff"
+    android:paddingLeft="5dp" />
 
-    <Button
-        android:id="@+id/btnOff"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="work" />
+<ListView android:id="@+id/paired_devices"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:stackFromBottom="false"
+    android:layout_weight="1"
+    />
 
-    <Button
-        android:id="@+id/btnOn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btnOff"
-        android:layout_centerHorizontal="true"
-        android:text="train" />
+<TextView
+    android:id="@+id/connecting"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <TextView
-        android:id="@+id/txtArduino"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="" />
-
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:alpha="0.5" />
-
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btnOff"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="44dp"
-        android:ems="10"
-        android:hint="Message"
-        android:inputType="textPersonName" />
-
-    <Button
-        android:id="@+id/send"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/btnOff"
-        android:layout_below="@+id/editText"
-        android:text="Send" />
+    </LinearLayout>
 
 </RelativeLayout>
 
