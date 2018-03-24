@@ -46,6 +46,19 @@ import java.util.UUID;
 import android.speech.tts.TextToSpeech;
 import android.widget.Toast;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.telephony.SmsManager;
+import android.test.mock.MockPackageManager;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
 
 //import umich.cse.yctung.androidlibsvm.LibSVM;
 
@@ -54,6 +67,23 @@ import android.widget.Toast;
 
 public class SecondActivity extends Activity{
     private static final String TAG = "bluetooth";
+
+
+
+    private static final int MY_PERMISSIONS_REQUEST_SEND_SMS =0 ;
+    EditText txtMessage;
+    String phoneNo="9880351308";
+    String messagesos;
+    Button btnShowLocation;
+    private static final int REQUEST_CODE_PERMISSION = 2;
+    String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+
+    // GPSTracker class
+    GPSTracker gps;
+
+
+
+
 
     TextToSpeech t1;
     Button btrain, bwork,replay;
@@ -452,6 +482,68 @@ public class SecondActivity extends Activity{
                     //inputText.setText(myData);
                 }
                 return true;
+            }
+        });
+
+
+
+
+
+
+
+        try {
+            if (ActivityCompat.checkSelfPermission(this, mPermission)
+                    != MockPackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this, new String[]{mPermission},
+                        REQUEST_CODE_PERMISSION);
+
+                // If any permission above not allowed by user, this condition will
+                //  execute every time, else your else part will work
+            }
+            if (ContextCompat.checkSelfPermission(this,
+                    Manifest.permission.SEND_SMS)
+                    != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.SEND_SMS},
+                        MY_PERMISSIONS_REQUEST_SEND_SMS);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        //txtMessage = (EditText) findViewById(R.id.editText2);
+        btnShowLocation = (Button) findViewById(R.id.sos);
+
+        // show location button click event
+        btnShowLocation.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // create class object
+                gps = new GPSTracker(SecondActivity.this);
+
+                // check if GPS enabled
+                if(gps.canGetLocation()){
+
+                    double latitude = gps.getLatitude();
+                    double longitude = gps.getLongitude();
+                    //message = txtMessage.getText().toString();
+
+                    SmsManager smsManager = SmsManager.getDefault();
+                    smsManager.sendTextMessage(phoneNo, null, "Emergency"+"\nLOCATION:https://www.google.com/maps?q="+latitude+","+longitude, null, null);
+
+                    // \n is for new line
+                    Toast.makeText(getApplicationContext(), "Your Location is - \nLat: "
+                            + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
+
+                }else{
+                    // can't get location
+                    // GPS or Network is not enabled
+                    // Ask user to enable GPS/network in settings
+                    gps.showSettingsAlert();
+                }
+
             }
         });
 
