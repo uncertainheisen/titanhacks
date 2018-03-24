@@ -26,7 +26,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import java.util.Locale;
 //import org.apache.commons.math.ArgumentOutsideDomainException;
 
 import java.io.BufferedReader;
@@ -43,6 +43,9 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.UUID;
+import android.speech.tts.TextToSpeech;
+import android.widget.Toast;
+
 
 //import umich.cse.yctung.androidlibsvm.LibSVM;
 
@@ -52,7 +55,8 @@ import java.util.UUID;
 public class SecondActivity extends Activity{
     private static final String TAG = "bluetooth";
 
-    Button btrain, bwork;
+    TextToSpeech t1;
+    Button btrain, bwork,replay;
     TextView tvalue, wvalue;
     EditText message;
     Handler h;
@@ -78,7 +82,7 @@ public class SecondActivity extends Activity{
     private static String address = "98:D3:34:90:B8:02";
     File train, work;
     FileWriter mFileWriter;
-
+    String nstr = "NO gesture";
     String dir = "data";
     String myData = "";
     String mes = null;
@@ -97,8 +101,7 @@ public class SecondActivity extends Activity{
     private OutputStream outStream = null;
     private InputStream inStream = null;
 
-    // UUID service - This is the type of Bluetooth device that the BT module is
-    // It is very likely yours will be the same, if not google UUID for your manufacturer
+    // UUID service - This is the type of Bluetooth device that the BT module is// It is very likely yours will be the same, if not google UUID for your manufacturer
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     // MAC-address of Bluetooth module
@@ -111,7 +114,14 @@ public class SecondActivity extends Activity{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_second);
-
+        t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if(status != TextToSpeech.ERROR) {
+                    t1.setLanguage(Locale.UK);
+                }
+            }
+        });
         tvalue = (TextView) findViewById(R.id.tvalue);
         wvalue = (TextView) findViewById(R.id.wvalue);
         message = (EditText) findViewById(R.id.message);
@@ -131,6 +141,8 @@ public class SecondActivity extends Activity{
         //mDetect = (Button) findViewById(R.id.mDetect);
         btrain = (Button) findViewById(R.id.train);
         bwork = (Button) findViewById(R.id.work);
+        replay = (Button) findViewById(R.id.replay);
+
 
         //getting the bluetooth adapter value and calling checkBTstate function
         btAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -388,6 +400,8 @@ public class SecondActivity extends Activity{
 
                             if (flag == 2) {
                                 tvalue.setText(gestureName);
+                                nstr = gestureName;
+                                t1.speak(gestureName, TextToSpeech.QUEUE_FLUSH, null);
                                 break;
                             }
 
@@ -395,11 +409,20 @@ public class SecondActivity extends Activity{
                         }
                         if(flag<2) {
                             tvalue.setText("No gesture matched");
+                            nstr = "NO gesture matched";
+                            t1.speak("No gesture matched", TextToSpeech.QUEUE_FLUSH, null);
                         }
 
 
 
+                        replay.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
+
+                                t1.speak(nstr, TextToSpeech.QUEUE_FLUSH, null);
+                            }
+                        });
 
 
 
