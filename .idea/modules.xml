@@ -4,8 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://C:\Users\nithin\Desktop\bluetooth\app\app.iml" filepath="C:\Users\nithin\Desktop\bluetooth\app\app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/bluetooth.iml" filepath="$PROJECT_DIR$/bluetooth.iml" />
       <module fileurl="file://C:\Users\nithin\Desktop\bluetooth\bluetooth.iml" filepath="C:\Users\nithin\Desktop\bluetooth\bluetooth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bluetooth.iml" filepath="$PROJECT_DIR$/bluetooth.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hacks.iml" filepath="$PROJECT_DIR$/hacks.iml" />
     </modules>
   </component>
 </project>
