@@ -17,6 +17,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -60,12 +61,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-
-//import umich.cse.yctung.androidlibsvm.LibSVM;
-
-//import static com.example.nithin.androidgk.CreateDataset.linearInterp;
-//import static com.example.nithin.androidgk.CreateDataset.linspace;
 
 public class SecondActivity extends Activity{
     private static final String TAG = "bluetooth";
@@ -183,59 +178,35 @@ public class SecondActivity extends Activity{
         h = new Handler() {
             public void handleMessage(android.os.Message msg) {
                 switch (msg.what) {
-                    case RECIEVE_MESSAGE:													// if receive massage
-                        //byte[] readBuf = (byte[]) msg.obj;
-                        //String strIncom = new String(readBuf, 0, msg.arg1);					// create string from bytes array
+                    case RECIEVE_MESSAGE:		// if receive massage
+					                            // create string from bytes array
                         String recv = (String) msg.obj;
 
 
                     if(start)
                     {
-                        //String test=null;
                         sb1.append(recv);
-                        // append string
-                        //sb2.append(recv);
-                        //tvalue.setText(recv);
-
-
-                        /*String[] split = recv.split("$");
-                        String firstSubString = split[0];
-                        String secondSubString = split[1];
-
-                        sb1.append(firstSubString);
-                        sb1.append(secondSubString);*/
-
-
-
 
                         int startOfLineIndex = sb1.indexOf("#");
                         int endOfLineIndex = sb1.indexOf("$",startOfLineIndex);							// determine the end-of-line
-                        if (endOfLineIndex > startOfLineIndex) {                                           // if end-of-line,
-                          // sb1.append("\n");
-                            //String sbprint = sb2.substring(0, endOfLineIndex);
-                            sbprint = sb1.substring(startOfLineIndex+1, endOfLineIndex);				// extract string
-                            //sb1.delete(0, sb1.length()); and clear
-                           // int word_c = word_count(sbprint);
+                        if (endOfLineIndex > startOfLineIndex) {
+                            sbprint="";// if end-of-line,
+                        for(int i=startOfLineIndex+1;i<endOfLineIndex;i++) {
+                            if(Character.isDigit(sb1.charAt(i)))
+                            sbprint = sbprint + sb1.charAt(i);
+                            else if(sb1.charAt(i)==' ')
+                                sbprint= sbprint + sb1.charAt(i); // extract string
 
 
-
-                      //      Read more: http://www.java67.com/2016/09/3-ways-to-count-words-in-java-string.html#ixzz5LtQPn6Cz
-
+                        }
                             if(check == 1)
                                 tvalue.setText(sbprint); 	        // update TextView
-                            else if(check == 2) {
+                            else if(check == 2)
                                 wvalue.setText(sbprint);
-                                //workstr = sbprint;
-                            }
                             sb1.delete(0,sb1.length());
-                            //sb2.delete(0,sb2.length());
-                            //btnOff.setEnabled(true);
-                            //btnOn.setEnabled(true);
                         }
-
-
                     }
-                        //Log.d(TAG, "...String:"+ sb.toString() +  "Byte:" + msg.arg1 + "...");
+
                         break;
                 }
             };
@@ -255,37 +226,22 @@ public class SecondActivity extends Activity{
                     if (message.getText().toString().matches(""))
                         Toast.makeText(getApplicationContext(), "Enter the value in 'message' field", Toast.LENGTH_SHORT).show();
                     else {
-                        try {
-                                mFileWriter = new FileWriter(train,true);
-                            }
-                        catch(IOException e) {
-                            e.printStackTrace();
-                        }
-
-
-                        mes = message.getText().toString() + " - ";
-                        //sb1.append(mes);
-                        Log.d("Debug: ", "key pressed\n");
-
-                        check = 1;
-                        start = true;
-                        //sendData("k");
-
-                                                   /*try {
-                                // Read from the InputStream
-                                Log.d("Debug: ", "Reading in run()\n");
-                                bytes = inStream.read(buffer); // Get number of bytes and message in "buffer"
-                                String str = buffer.toString();
-                                tvalue.setText(str);
-                                sb1.append(str);
-                                //h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();		// Send to message queue Handler
-                            } catch (IOException e) {
+                            try {
+                                    mFileWriter = new FileWriter(train,true);
+                                }
+                            catch(IOException e) {
                                 e.printStackTrace();
-                            }*/
+                            }
 
-                    }
+
+                            mes = message.getText().toString() + " - ";
+                            Log.d("Debug: ", "key pressed\n");
+                            check = 1;
+                            start = true;
+                        }
                 }
-                else if (event.getAction() == MotionEvent.ACTION_UP) {
+                else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
                     Log.d("Debug: ", "Stoping...\n");
                    start = false;
                     check = 0;
@@ -333,19 +289,6 @@ public class SecondActivity extends Activity{
                     mes = " ";
                     check = 2;
                     start = true;
-                    /*while (start) {
-                        try {
-                            // Read from the InputStream
-                            Log.d("Debug: ", "Reading in run()\n");
-                            bytes = inStream.read(buffer); // Get number of bytes and message in "buffer"
-                            String str = buffer.toString();
-                            wvalue.setText(str);
-                            sb1.append(str);
-                            //h.obtainMessage(RECIEVE_MESSAGE, bytes, -1, buffer).sendToTarget();		// Send to message queue Handler
-                        } catch (IOException e) {
-                            break;
-                        }
-                    }*/
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP) {
                     Log.d("Debug: ", "Stoping...\n");
@@ -363,39 +306,29 @@ public class SecondActivity extends Activity{
                         }
                         StringTokenizer tokens = new StringTokenizer(sbprint);
                         int wc = tokens.countTokens();
-                        if (wc!=3)
+                        if (wc!=3) {
+                            mFileWriter.close();
                             throw new IOException("NO VALUES");
+                        }
                         if(wc==3 && (fw==0)) {
 
                             mFileWriter.write(sbprint.toString() + "\n");
                         }
                         mFileWriter.close();
-                        //split sbprint across space into integer array of 3
-                        //open train.txt for reading
-                        //for line 1 to n
-                        //remove text and store it in gesture name
-                        //remove till hyphen and store it in string1
-                        //split string1 across space into another integer array of 3
-                        // check with arr1 and arr2
-                        //if equals print text break
-                        //else repeat loop
-
                         tvalue.setText(sbprint);
-
-
-
                         workstring = sbprint.split(" ");
+                        Log.i(TAG,"w before split: "+sbprint);
+                        Log.i(TAG,"w: "+workstring[0]+" "+workstring[1]+" "+workstring[2]);
 
 
                         for(i=0;i<3;i++) {
                             try {
                                 workint[i] = Integer.parseInt(workstring[i]);
                             } catch (NumberFormatException nfe) {
-                                //tv.setText("Could not parse " + nfe);
                             }
                         }
 
-                        tvalue.setText("parsed");
+
 
 
 
@@ -408,7 +341,7 @@ public class SecondActivity extends Activity{
 
                         flag=0;
 
-//                        for(i=0;i<10;i++) {
+
                         while(strLine != null) {
                             flag=0;
                             int length = 0;
@@ -425,7 +358,7 @@ public class SecondActivity extends Activity{
 
                             gestureName = rawtrain.substring(startindex, endindex);
 
-                            tvalue.setText(gestureName);
+
 
                             startindex = endindex;
                             endindex = length;
@@ -433,54 +366,38 @@ public class SecondActivity extends Activity{
                             tvalue.setText("" + endindex);
                             trainstringspace = rawtrain.substring(startindex + 2, endindex);
 
-                            tvalue.setText(trainstringspace);
+                            Log.i(TAG,"train before split: "+trainstringspace);
 
 
                             trainstring = trainstringspace.split(" ");
+                            Log.i(TAG,"train after split: "+trainstring[0]+" "+trainstring[1]+" "+trainstring[2]);
 
                             for (i = 0; i < 3; i++) {
                                 try {
                                     trainint[i] = Integer.parseInt(trainstring[i]);
                                 } catch (NumberFormatException nfe) {
-                                    //tv.setText("Could not parse " + nfe);
                                 }
                             }
+                            Log.i(TAG,""+workint[0]+" "+workint[1]+" "+workint[2]+" "+trainint[0]+" "+trainint[1]+" "+trainint[2]);
 
-                            tvalue.setText("before compare");
+                            if ((workint[0] >= 0 && trainint[0] >= 0) || (workint[0] < 0 && trainint[0] < 0))
 
-                            if ((workint[0] >= 0 && trainint[0] >= 0) || (workint[0] < 0 && trainint[0] < 0)) {
-                              //  for (i = 1; i < 3; i++) {
-                                   // if ((workint[1] >= trainint[1] - 4 && workint[1] <= trainint[1] + 4)&&(workint[2] >= trainint[2] - 4 && workint[2] <= trainint[2] + 4)){
-
-
-                                //        flag=2;
-                                //    }
-                                //}
-                                if((Math.abs(workint[1]-trainint[1])<=3)&&(Math.abs(workint[2]-trainint[2])<=3))
-                                    flag=2;
+                                if((Math.abs(workint[1]-trainint[1])<=3)&&(Math.abs(workint[2]-trainint[2])<=3)){
+                                    tvalue.setText(gestureName);
+                                    nstr = gestureName;
+                                    t1.speak(gestureName, TextToSpeech.QUEUE_FLUSH, null);
+                                    flag=1;
+                                    break;
 
                             }
-
-
-                            tvalue.setText("after");
-                            tvalue.setText("" + flag);
-                            tvalue.setText("" + workint[0] + " " + trainint[0] + " " + workint[1] + " " + trainint[1] + workint[2] + " " + trainint[2]);
-
-                            if (flag == 2) {
-                                tvalue.setText(gestureName);
-                                nstr = gestureName;
-                                t1.speak(gestureName, TextToSpeech.QUEUE_FLUSH, null);
-                                break;
-                            }
-
-
                         }
-                        if(flag!=2) {
+                        if(flag!=1) {
                             tvalue.setText("No gesture matched");
                             nstr = "NO gesture matched";
                             t1.speak("No gesture matched", TextToSpeech.QUEUE_FLUSH, null);
-                            flag=0;
+
                         }
+
 
 
 
@@ -495,7 +412,7 @@ public class SecondActivity extends Activity{
 
 
 
-
+                        fis.getChannel().position(0);
                        in.close();
 
 
@@ -514,8 +431,10 @@ public class SecondActivity extends Activity{
 
 
 
+
                     }catch (IOException e){
-                        e.printStackTrace();
+                       // e.printStackTrace();
+
                     }
                     sb1.delete(0, sb1.length());
                     //inputText.setText(myData);
