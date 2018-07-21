@@ -28,7 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Locale;
 //import org.apache.commons.math.ArgumentOutsideDomainException;
-
+import java.util.StringTokenizer;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -45,6 +45,8 @@ import java.util.Scanner;
 import java.util.UUID;
 import android.speech.tts.TextToSpeech;
 import android.widget.Toast;
+import java.lang.*;
+
 
 import android.Manifest;
 import android.app.Activity;
@@ -212,7 +214,13 @@ public class SecondActivity extends Activity{
                           // sb1.append("\n");
                             //String sbprint = sb2.substring(0, endOfLineIndex);
                             sbprint = sb1.substring(startOfLineIndex+1, endOfLineIndex);				// extract string
-                            //sb1.delete(0, sb1.length());										// and clear
+                            //sb1.delete(0, sb1.length()); and clear
+                           // int word_c = word_count(sbprint);
+
+
+
+                      //      Read more: http://www.java67.com/2016/09/3-ways-to-count-words-in-java-string.html#ixzz5LtQPn6Cz
+
                             if(check == 1)
                                 tvalue.setText(sbprint); 	        // update TextView
                             else if(check == 2) {
@@ -253,6 +261,8 @@ public class SecondActivity extends Activity{
                         catch(IOException e) {
                             e.printStackTrace();
                         }
+
+
                         mes = message.getText().toString() + " - ";
                         //sb1.append(mes);
                         Log.d("Debug: ", "key pressed\n");
@@ -281,9 +291,21 @@ public class SecondActivity extends Activity{
                     check = 0;
                     Log.d("Debug: ", "stopped receiving\n");
                     try {
-                        mFileWriter.append(mes.toString());
-                        mFileWriter.append(sbprint.toString() + "\n");
-                        mFileWriter.close();
+                            int ft=0;
+                        if (sbprint == null || sbprint.isEmpty()) {
+                            ft=1;
+                        }
+                        StringTokenizer tokens = new StringTokenizer(sbprint);
+                        int wc = tokens.countTokens();
+
+                        if(wc==3 && (ft==0)) {
+                            mFileWriter.append(mes.toString());
+                            mFileWriter.append(sbprint.toString() + "\n");
+                        }
+                            mFileWriter.close();
+
+
+
                     }
                     catch (IOException e){
                         e.printStackTrace();
@@ -335,7 +357,18 @@ public class SecondActivity extends Activity{
 
                         writer.flush();
                         writer.close();
-                        mFileWriter.write(sbprint.toString() + "\n");
+                        int fw=0;
+                        if (sbprint == null || sbprint.isEmpty()) {
+                            fw=1;
+                        }
+                        StringTokenizer tokens = new StringTokenizer(sbprint);
+                        int wc = tokens.countTokens();
+                        if (wc!=3)
+                            throw new IOException("NO VALUES");
+                        if(wc==3 && (fw==0)) {
+
+                            mFileWriter.write(sbprint.toString() + "\n");
+                        }
                         mFileWriter.close();
                         //split sbprint across space into integer array of 3
                         //open train.txt for reading
@@ -373,7 +406,7 @@ public class SecondActivity extends Activity{
 
                         String strLine = br.readLine();;
 
-
+                        flag=0;
 
 //                        for(i=0;i<10;i++) {
                         while(strLine != null) {
@@ -416,11 +449,16 @@ public class SecondActivity extends Activity{
                             tvalue.setText("before compare");
 
                             if ((workint[0] >= 0 && trainint[0] >= 0) || (workint[0] < 0 && trainint[0] < 0)) {
-                                for (i = 1; i < 3; i++) {
-                                    if (workint[i] >= trainint[i] - 3 && workint[i] <= trainint[i] + 3) {
-                                        flag++;
-                                    }
-                                }
+                              //  for (i = 1; i < 3; i++) {
+                                   // if ((workint[1] >= trainint[1] - 4 && workint[1] <= trainint[1] + 4)&&(workint[2] >= trainint[2] - 4 && workint[2] <= trainint[2] + 4)){
+
+
+                                //        flag=2;
+                                //    }
+                                //}
+                                if((Math.abs(workint[1]-trainint[1])<=3)&&(Math.abs(workint[2]-trainint[2])<=3))
+                                    flag=2;
+
                             }
 
 
@@ -437,10 +475,11 @@ public class SecondActivity extends Activity{
 
 
                         }
-                        if(flag<2) {
+                        if(flag!=2) {
                             tvalue.setText("No gesture matched");
                             nstr = "NO gesture matched";
                             t1.speak("No gesture matched", TextToSpeech.QUEUE_FLUSH, null);
+                            flag=0;
                         }
 
 
@@ -597,6 +636,13 @@ public class SecondActivity extends Activity{
         return outputLetterInString;
     }*/
 
+    public int word_count(String sbprint){
+        if (sbprint == null || sbprint.isEmpty()) {
+            return 0;
+        }
+        StringTokenizer tokens = new StringTokenizer(sbprint);
+        return tokens.countTokens();
+    }
 
     @Override
     public void onResume() {
